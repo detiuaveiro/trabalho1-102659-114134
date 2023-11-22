@@ -172,6 +172,29 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
+
+  Image newImage = (Image *)malloc(sizeof(Image));
+  if(newImage == NULL){
+    perror("Memory allocation failed");
+    return NULL;
+  }
+
+  newImage->width = width;
+  newImage->height = height;
+
+  newImage->pixel =(uint8_t *)malloc(width * height * sizeof(uint8_t));
+  if(newImage->pixel == NULL){
+    perror("Memory alloction failed");
+    free(newImage);
+    return NULL;
+  }
+
+  for (int i = 0; i < width * height; i++) {
+        newImage->pixel[i] = 0; // Assuming 0 represents black
+    }
+
+  
+  return newImage;
 }
 
 /// Destroy the image pointed to by (*imgp).
@@ -182,6 +205,16 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
   // Insert your code here!
+  if (*imgp != NULL) {
+    // Free the pixel data
+    free((*imgp)->pixel);
+
+    // Free the image structure
+    free(*imgp);
+
+    // Set the pointer to NULL to indicate that the image has been destroyed
+    *imgp = NULL;
+  }
 }
 
 
