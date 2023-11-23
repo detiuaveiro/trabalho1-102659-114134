@@ -173,27 +173,24 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
 
-  Image newImage = (Image *)malloc(sizeof(Image));
+  Image newImage = malloc(sizeof(struct image));
   if(newImage == NULL){
-    perror("Memory allocation failed");
+    errCause = "Memory allocation failed";
+    errno = 12;
     return NULL;
   }
 
   newImage->width = width;
   newImage->height = height;
+  newImage->maxval = maxval;
 
-  newImage->pixel =(uint8_t *)malloc(width * height * sizeof(uint8_t));
+  newImage->pixel =calloc(width * height, sizeof(uint8_t));
   if(newImage->pixel == NULL){
-    perror("Memory alloction failed");
+    errCause = "Memory alloction failed";
+    errno = 12;
     free(newImage);
     return NULL;
-  }
-
-  for (int i = 0; i < width * height; i++) {
-        newImage->pixel[i] = 0; // Assuming 0 represents black
-    }
-
-  
+  }  
   return newImage;
 }
 
@@ -406,6 +403,9 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 void ImageNegative(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
+  for(int i=0; i<img->width * img->height;i++){
+    img->pixel[i]=img->maxval -img->pixel[i];
+  }
 }
 
 /// Apply threshold to image.
