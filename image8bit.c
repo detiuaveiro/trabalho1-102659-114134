@@ -414,6 +414,13 @@ void ImageNegative(Image img) { ///
 void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
+   for (int i = 0; i < img->width * img->height; i++) {
+    if (img->pixel[i] < thr) {
+      img->pixel[i] = 0; // Set to black
+    } else {
+      img->pixel[i] = img->maxval; // Set to white (maxval)
+    }
+  }
 }
 
 /// Brighten image by a factor.
