@@ -550,6 +550,19 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   assert (ImageValidRect(img, x, y, w, h));
   // Insert your code here!
+  Image croppedImg = ImageCreate(w, h, img->maxval);
+
+  // Iterate through each row in the cropped image
+  for (int i = 0; i < h; i++) {
+      // Iterate through each column in the cropped image
+      for (int j = 0; j < w; j++) {
+          // Copy pixel value from original image to cropped image
+          croppedImg->pixel[i * w + j] = img->pixel[(y + i) * img->width + (x + j)];
+      }
+  }
+
+  return croppedImg;
+
 }
 
 
@@ -564,6 +577,14 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  for (int i = 0; i < img2->height; i++) {
+      // Iterate through each column in img2
+      for (int j = 0; j < img2->width; j++) {
+          // Copy pixel value from img2 to img1 at the specified position
+          img1->pixel[(y + i) * img1->width + (x + j)] = img2->pixel[i * img2->width + j];
+      }
+  }
+
 }
 
 /// Blend an image into a larger image.
@@ -577,6 +598,23 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  for (int i = 0; i < img2->height; i++) {
+      // Iterate through each column in img2
+      for (int j = 0; j < img2->width; j++) {
+          // Get pixel values from both images
+          int pixel_img1 = img1->pixel[(y + i) * img1->width + (x + j)];
+          int pixel_img2 = img2->pixel[i * img2->width + j];
+
+          // Blend the pixels using the specified alpha value
+          int blended_pixel = (int)(alpha * pixel_img2 + (1 - alpha) * pixel_img1);
+
+          // Saturate to prevent overflows/underflows
+          blended_pixel = (blended_pixel < 0) ? 0 : ((blended_pixel > 255) ? 255 : blended_pixel);
+
+          // Update the pixel value in img1
+          img1->pixel[(y + i) * img1->width + (x + j)] = blended_pixel;
+      }
+  }
 }
 
 /// Compare an image to a subimage of a larger image.
