@@ -350,6 +350,18 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
+  if (x < 0 || y < 0 || x >= img->width || y >= img->height) {
+        return 0;  // Not valid, starting point outside the image
+    }
+
+    // Check if the rectangle extends beyond the right or bottom edges of the image
+    if (x + w > img->width || y + h > img->height) {
+        return 0;  // Not valid, rectangle extends beyond image boundaries
+    }
+
+    // If all conditions are satisfied, the rectangle is valid
+    return 1;
+
 }
 
 /// Pixel get & set operations
@@ -429,8 +441,33 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  // ? assert (factor >= 0.0);
+  assert (factor >= 0.0);
   // Insert your code here!
+  assert(factor >= 0.0);
+
+  // Iterate through each pixel in the image
+
+  for (int i = 0; i < img->width * img->height; i++) {
+
+    double intensity = img->pixel[i];
+
+    // Multiply the intensity by the factor
+    intensity *= factor;
+
+    // Saturate at maxval
+    if (intensity > img->maxval) {
+        intensity = img->maxval;
+    }
+
+    // Convert to uint8_t
+    uint8_t new_intensity = (uint8_t)intensity;
+
+    // Update the pixel intensity in the image
+    img->pixel[i] = new_intensity;
+
+  
+  }
+
 }
 
 
@@ -458,6 +495,18 @@ void ImageBrighten(Image img, double factor) { ///
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
+  Image rotatedImg = ImageCreate(img->height, img->width, img->maxval);
+
+  // Iterate through each pixel in the original image
+  for (int i = 0; i < img->height; i++) {
+      for (int j = 0; j < img->width; j++) {
+          // Copy pixel value from original image to rotated image in the rotated position
+          rotatedImg->pixel[(rotatedImg->height - 1 - j) * rotatedImg->width + i] = img->pixel[i * img->width + j];
+      }
+  }
+
+  return rotatedImg;
+
 }
 
 /// Mirror an image = flip left-right.
@@ -470,6 +519,19 @@ Image ImageRotate(Image img) { ///
 Image ImageMirror(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
+  Image mirroredImg = ImageCreate(img->width, img->height, img->maxval);
+
+  // Iterate through each row in the original image
+  for (int i = 0; i < img->height; i++) {
+      // Iterate through each column in the original image
+      for (int j = 0; j < img->width; j++) {
+          // Copy pixel value from original image to mirrored image in the mirrored position
+          mirroredImg->pixel[i * img->width + (img->width - 1 - j)] = img->pixel[i * img-> width + j];
+      }
+  }
+
+  return mirroredImg;
+
 }
 
 /// Crop a rectangular subimage from img.
