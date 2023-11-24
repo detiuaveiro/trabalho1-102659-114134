@@ -625,6 +625,18 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
   // Insert your code here!
+  for (int i = 0; i < img2->height; i++) {
+      // Iterate through each column in img2
+      for (int j = 0; j < img2->width; j++) {
+          // Check if the corresponding pixels match
+          if (ImageValidPos(img1, x + j, y + i) &&
+              img1->pixel[(y + i) * img1->width + (x + j)] != img2->pixel[i * img2->width + j]) {
+              return 0; // Pixels don't match
+          }
+      }
+  }
+
+  return 1; // All pixels match
 }
 
 /// Locate a subimage inside another image.
