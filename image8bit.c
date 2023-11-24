@@ -675,74 +675,67 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
   assert(img != NULL);
+  // Ensure that blur parameters are non-negative
   assert(dx >= 0 && dy >= 0);
-  
-    
-    Image newImage = ImageCreate(img->width, img->height, img->maxval);
 
-    if (newImage == NULL)
-    {
-      return;
-    }
+  // Create a new image with the same dimensions and maximum pixel value
+  Image newImage = ImageCreate(img->width, img->height, img->maxval);
 
-    for (size_t i = 0; i < img->width; i++)
-    {
-      
-      
-      for (size_t j = 0; j < img->height; j++)
-      {
-        
+  // Check if memory allocation for the new image was successful
+  if (newImage == NULL) {
+    return;
+  }
 
-        double sum = 0;
-        double count = 0;
-        int countx = i-dx;
-        int county = j-dy;
+  // Iterate through each pixel in the original image
+  for (size_t i = 0; i < img->width; i++) {
+    for (size_t j = 0; j < img->height; j++) {
+      // Initialize variables to calculate the mean pixel value in the neighborhood
+      double sum = 0;
+      double count = 0;
+      int startX = i - dx;
+      int startY = j - dy;
 
-        if (countx < 0)
-        {
-          countx = 0;
-        }
-        if (county < 0)
-        {
-          county = 0;
-        }         
+      // Ensure that the starting coordinates are within bounds
+      if (startX < 0) {
+        startX = 0;
+      }
+      if (startY < 0) {
+        startY = 0;
+      }
 
-        for (size_t k = countx; k <= i + dx; k++)
-        {
-          
-          for (size_t l = county; l <= j + dy; l++)
-          {
-            if (ImageValidPos(img, k, l))
-            {
-              sum += ImageGetPixel(img, k, l);
-              count++;
-            }
+      // Iterate through the neighborhood surrounding the current pixel
+      for (size_t k = startX; k <= i + dx; k++) {
+        for (size_t l = startY; l <= j + dy; l++) {
+          // Check if the current position is valid in the original image
+          if (ImageValidPos(img, k, l)) {
+            // Accumulate pixel values and count valid pixels
+            sum += ImageGetPixel(img, k, l);
+            count++;
           }
         }
-        uint8 mean = (uint8)round(sum / count);
-        if (mean > img->maxval)
-        {
-          mean = img->maxval;
-        }
-        else if (mean < 0)
-        {
-          mean = 0;
-        }
-        
-        ImageSetPixel(newImage, i, j,mean );
       }
-    }
 
-    for (size_t i = 0; i < img->width; i++)
-    {
-      for (size_t j = 0; j < img->height; j++)
-      {
-        ImageSetPixel(img, i, j, ImageGetPixel(newImage, i, j));
+      // Calculate the mean pixel value and ensure it is within valid range
+      uint8 mean = (uint8)round(sum / count);
+      if (mean > img->maxval) {
+        mean = img->maxval;
+      } else if (mean < 0) {
+        mean = 0;
       }
+
+      // Set the mean pixel value in the new image
+      ImageSetPixel(newImage, i, j, mean);
     }
-  
-    ImageDestroy(&newImage);
+  }
 
+  // Copy the pixel values from the new image to the original image
+  for (size_t i = 0; i < img->width; i++) {
+    for (size_t j = 0; j < img->height; j++) {
+      ImageSetPixel(img, i, j, ImageGetPixel(newImage, i, j));
+    }
+  }
 
+  // Destroy the new image to free up memory
+  ImageDestroy(&newImage);
 }
 
