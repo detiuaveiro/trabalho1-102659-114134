@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "instrumentation.h"
+#include <math.h>
 
 // The data structure
 //
@@ -673,41 +674,75 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
-  assert(img->pixel != NULL);
+  assert(img != NULL);
+  assert(dx >= 0 && dy >= 0);
+  
+    
+    Image newImage = ImageCreate(img->width, img->height, img->maxval);
 
-  // Create a temporary array to store the blurred image
-  int* blurredImage = (int*)malloc(img->width * img->height * sizeof(int));
-  assert(blurredImage != NULL);
+    if (newImage == NULL)
+    {
+      return;
+    }
 
-  // Iterate through each pixel in the image
-  for (int i = 0; i < img->height; i++) {
-      for (int j = 0; j < img->width; j++) {
-          int sum = 0;
-          int count = 0;
+    for (size_t i = 0; i < img->width; i++)
+    {
+      
+      
+      for (size_t j = 0; j < img->height; j++)
+      {
+        
 
-          // Iterate through the pixels in the specified rectangle
-          for (int m = i - dy; m <= i + dy; m++) {
-              for (int n = j - dx; n <= j + dx; n++) {
-                  // Check if the current position is inside the image
-                  if (ImageValidPos(img, n, m)) {
-                      sum += img->pixel[m * img->width + n];
-                      count++;
-                  }
-              }
+        double sum = 0;
+        double count = 0;
+        int countx = i-dx;
+        int county = j-dy;
+
+        if (countx < 0)
+        {
+          countx = 0;
+        }
+        if (county < 0)
+        {
+          county = 0;
+        }         
+
+        for (size_t k = countx; k <= i + dx; k++)
+        {
+          
+          for (size_t l = county; l <= j + dy; l++)
+          {
+            if (ImageValidPos(img, k, l))
+            {
+              sum += ImageGetPixel(img, k, l);
+              count++;
+            }
           }
-
-          // Calculate the mean and assign it to the blurred image
-          blurredImage[i * img->width + j] = (count > 0) ? (sum / count) : 0;
+        }
+        uint8 mean = (uint8)round(sum / count);
+        if (mean > img->maxval)
+        {
+          mean = img->maxval;
+        }
+        else if (mean < 0)
+        {
+          mean = 0;
+        }
+        
+        ImageSetPixel(newImage, i, j,mean );
       }
-  }
+    }
 
-  // Copy the blurred image back to the original image
-  for (int i = 0; i < img->height * img->width; i++) {
-      img->pixel[i] = blurredImage[i];
-  }
+    for (size_t i = 0; i < img->width; i++)
+    {
+      for (size_t j = 0; j < img->height; j++)
+      {
+        ImageSetPixel(img, i, j, ImageGetPixel(newImage, i, j));
+      }
+    }
+  
+    ImageDestroy(&newImage);
 
-  // Free the temporary array
-  free(blurredImage);
 
 }
 
