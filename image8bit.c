@@ -647,6 +647,18 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   // Insert your code here!
+  for (int i = 0; i < img1->height; i++) {
+      for (int j = 0; j < img1->width; j++) {
+          // Check if img2 matches at the current position
+          if (ImageMatchSubImage(img1, j, i, img2)) {
+              // Update the variables with the matching position
+              *px = j;
+              *py = i;
+              return 1; // Match found
+          }
+      }
+  }
+  return 0; // No match found
 }
 
 
