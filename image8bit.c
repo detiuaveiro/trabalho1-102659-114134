@@ -596,8 +596,16 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   for (int i = 0; i < img2->height; i++) {
       // Iterate through each column in img2
       for (int j = 0; j < img2->width; j++) {
+        uint8 blended_Pixel = (uint8)(alpha * ImageGetPixel (img2,j,i) + (1.0 -alpha)* ImageGetPixel(img1,x+j,y+i)+0.5);
           // Get pixel values from both images
-          int pixel_img1 = img1->pixel[(y + i) * img1->width + (x + j)];
+          if(blended_Pixel<0)
+            ImageSetPixel(img1,x+j,y+i,0);
+          else if (blended_Pixel > img1->maxval)
+            ImageSetPixel(img1,x+j,y+i,img1->maxval);
+          else
+            ImageSetPixel(img1,x+j,y+i,blended_Pixel);
+            
+          /* int pixel_img1 = img1->pixel[(y + i) * img1->width + (x + j)];
           int pixel_img2 = img2->pixel[i * img2->width + j];
 
           // Blend the pixels using the specified alpha value
@@ -607,7 +615,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
           blended_pixel = (blended_pixel < 0) ? 0 : ((blended_pixel > 255) ? 255 : blended_pixel);
 
           // Update the pixel value in img1
-          img1->pixel[(y + i) * img1->width + (x + j)] = blended_pixel;
+          img1->pixel[(y + i) * img1->width + (x + j)] = blended_pixel; */
       }
   }
 }
@@ -618,7 +626,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
 int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
-  assert (ImageValidPos(img1, x, y));
+  assert (ImageValidPos(img1, x, y)); 
   // Insert your code here!
   for (int i = 0; i < img2->height; i++) {
       // Iterate through each column in img2
