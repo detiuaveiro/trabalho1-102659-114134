@@ -7,6 +7,8 @@
 
 CFLAGS = -Wall -O2 -g
 
+LDLIBS = -lm
+
 PROGS = imageTool imageTest
 
 TESTS = test1 test2 test3 test4 test5 test6 test7 test8 test9
@@ -83,4 +85,3 @@ cleanobj:
 
 clean: cleanobj
 	rm -f $(PROGS)
-
