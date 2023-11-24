@@ -443,7 +443,7 @@ void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert (factor >= 0.0);
   // Insert your code here!
-  assert(factor >= 0.0);
+  
 
   // Iterate through each pixel in the image
 
@@ -456,18 +456,13 @@ void ImageBrighten(Image img, double factor) { ///
 
     // Saturate at maxval
     if (intensity > img->maxval) {
-        intensity = img->maxval;
+        //intensity = img->maxval;
+        img->pixel[i]=img->maxval;
     }
-
-    // Convert to uint8_t
-    uint8_t new_intensity = (uint8_t)intensity;
-
-    // Update the pixel intensity in the image
-    img->pixel[i] = new_intensity;
-
-  
+    else{
+      img->pixel[i] = (uint8) (intensity+0.5);
+    }
   }
-
 }
 
 
